@@ -1,10 +1,12 @@
 package com.handzap.newsscraper.util;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomText;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.Strings;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DataExtractionUtil {
@@ -54,7 +56,12 @@ public class DataExtractionUtil {
   }
 
   public static String getDescriptionFromNewsPage(HtmlPage newsPage) {
-    return EMPTY_STRING;
+    String description = newsPage.<DomText>getByXPath(
+        "//div[starts-with(@id,'content-body')]/descendant::*/text()").stream()
+        .filter(Objects::nonNull)
+        .map(DomText::toString)
+        .collect(Collectors.joining());
+    return null == description ? EMPTY_STRING : description;
   }
 
   public static List<DomNode> getArchiveContainersFromMainPage(HtmlPage mainPage) {

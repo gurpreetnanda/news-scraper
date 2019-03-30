@@ -1,3 +1,14 @@
 spring:
   main:
     banner-mode: "off"
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+      cluster-nodes: localhost:9345
+      cluster-name: elasticsearch
+
+elasticsearch:
+  index.name: news
+  user:
+    type: user

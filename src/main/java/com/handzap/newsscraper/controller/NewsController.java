@@ -25,8 +25,8 @@ public class NewsController {
   }
 
   @GetMapping("search")
-  public List<NewsDocument> search(String author, String keyword) {
-    return newsService.searchArticles(author, keyword);
+  public List<NewsDocument> search(String author, String topic, String description) {
+    return newsService.searchArticles(author, topic, description);
   }
 
 }

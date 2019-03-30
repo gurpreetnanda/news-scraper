@@ -1,27 +1,15 @@
 package com.handzap.newsscraper.dao;
 
 import com.handzap.newsscraper.model.NewsDocument;
-import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 
-@Service
-public class NewsDocumentsDao {
+@Repository
+public interface NewsDocumentsDao extends ElasticsearchRepository<NewsDocument, String> {
 
-  private final List<NewsDocument> newsDocumentList;
-
-  @Autowired
-  public NewsDocumentsDao() {
-    newsDocumentList = new ArrayList<>();
-  }
-
-  public void insertDocument(NewsDocument newsDocument) {
-    newsDocumentList.add(newsDocument);
-  }
-
-  public List<NewsDocument> getAll() {
-    return new ArrayList<>(newsDocumentList);
-  }
+  List<NewsDocument> findByAuthorAndTopicAndDescription(String author,
+                                                        String topic,
+                                                        String description);
 
 }

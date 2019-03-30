@@ -29,16 +29,17 @@ public class DataScrapingService {
                              NewsDocumentsDao newsDocumentsDao) {
     this.webClient = webClient;
     this.newsDocumentsDao = newsDocumentsDao;
-    this.initializeDatabase();
   }
 
+  //  todo: Use flowables for faster operations
   public void initializeDatabase() {
     log.info("Begin scraping news articles from : {}", ARCHIVE_URL);
     scrapeNewsDocuments()
-        .forEach(newsDocumentsDao::insertDocument);
+        .forEach(newsDocumentsDao::save);
     log.info("Scraping news articles from : {} is successful.", ARCHIVE_URL);
   }
 
+  //  todo: Use flowables for faster operations
   public List<NewsDocument> scrapeNewsDocuments() {
     return DataExtractionUtil.getArchiveContainersFromMainPage(getWebPage(ARCHIVE_URL).get())
         .stream()
