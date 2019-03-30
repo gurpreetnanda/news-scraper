@@ -1,6 +1,7 @@
 package com.handzap.newsscraper.model;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.handzap.newsscraper.util.DataExtractionUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,10 @@ public class NewsDocument {
   private String author;
 
   public static NewsDocument from(HtmlPage newsDocumentPage) {
-    String topic = newsDocumentPage.getFirstByXPath("//h1[@class='title']/text()").toString();
-    String author = newsDocumentPage.getFirstByXPath("//a[contains(@class, 'auth-nm')]/text()")
-        .toString();
-    return new NewsDocument(topic, "", author);
+    String topic = DataExtractionUtil.getTopicNameFromNewsPage(newsDocumentPage);
+    String description = DataExtractionUtil.getDescriptionFromNewsPage(newsDocumentPage);
+    String author = DataExtractionUtil.getAuthorNameFromNewsPage(newsDocumentPage);
+    return new NewsDocument(topic, description, author);
   }
+
 }
