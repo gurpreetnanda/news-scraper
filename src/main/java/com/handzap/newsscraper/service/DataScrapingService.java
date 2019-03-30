@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.Strings;
 import com.google.common.collect.Streams;
+import com.handzap.newsscraper.dao.NewsDocumentsDao;
 import com.handzap.newsscraper.model.NewsDocument;
 import com.handzap.newsscraper.util.DataExtractionUtil;
 import java.util.Collection;
@@ -18,13 +19,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataScrapingService {
 
-  private static final int LIMIT = 2;
   private static final String ARCHIVE_URL = "https://www.thehindu.com/archive/";
+
   private final WebClient webClient;
+  private final NewsDocumentsDao newsDocumentsDao;
 
   @Autowired
-  public DataScrapingService(WebClient webClient) {
+  public DataScrapingService(WebClient webClient,
+                             NewsDocumentsDao newsDocumentsDao) {
     this.webClient = webClient;
+    this.newsDocumentsDao = newsDocumentsDao;
+    this.initializeDatabase();
+  }
+
+  public void initializeDatabase() {
+    log.info("Begin scraping news articles from : {}", ARCHIVE_URL);
+    scrapeNewsDocuments()
+        .forEach(newsDocumentsDao::insertDocument);
+    log.info("Scraping news articles from : {} is successful.", ARCHIVE_URL);
   }
 
   public List<NewsDocument> scrapeNewsDocuments() {

@@ -1,5 +1,6 @@
 package com.handzap.newsscraper.controller;
 
+import com.handzap.newsscraper.model.NewsDocument;
 import com.handzap.newsscraper.service.NewsService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class NewsController {
   }
 
   @GetMapping("search")
-  public List<String> articles(String authorName, String keyword) {
-    return newsService.searchArticles(authorName, keyword);
+  public List<NewsDocument> search(String author, String keyword) {
+    return newsService.searchArticles(author, keyword);
   }
 
 }
