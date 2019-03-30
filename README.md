@@ -28,4 +28,4 @@ Following is the list of currently configured endpoints: (Can also be seen in Sw
 - Guava library - For various small String/Collection related operations.
 
 ## Configurability
-- -Ddata-scrape-limit=n (Default value=10) can be passed to configure how many nested crawls need to be made. This has been set to avoid doing a lot of network calls. 
+- -Ddata-scrape-limit=n (Default value=5) can be passed to configure how many nested crawls need to be made. This has been set to avoid doing a lot of network calls. 

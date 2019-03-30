@@ -1,16 +1,17 @@
 package com.handzap.newsscraper.service;
 
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.Strings;
-import com.google.common.collect.Streams;
 import com.handzap.newsscraper.dao.NewsDocumentsDao;
 import com.handzap.newsscraper.model.NewsDocument;
 import com.handzap.newsscraper.util.DataExtractionUtil;
-import java.util.Collection;
+import io.reactivex.Flowable;
+import io.reactivex.internal.schedulers.ComputationScheduler;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ public class DataScrapingService {
   @Autowired
   public DataScrapingService(WebClient webClient,
                              NewsDocumentsDao newsDocumentsDao,
-                             @Value("${data-scrape-limit:10}") int limit) {
+                             @Value("${data-scrape-limit:5}") int limit) {
     this.webClient = webClient;
     this.newsDocumentsDao = newsDocumentsDao;
     this.limit = limit;
@@ -37,11 +38,11 @@ public class DataScrapingService {
 
   /**
    * Clear and initialize the ES dump by refreshing the data from the source.
+   *
    * <p>
    * Exception is thrown when deleteAll() is called if there is no index.
    * This happens since Embedded ES is being used currently which is in-memory and deletes indexes at termination.
    */
-  //  todo: Use flowables for faster operations
   public void initializeDatabase() {
     try {
       newsDocumentsDao.deleteAll();
@@ -51,34 +52,44 @@ public class DataScrapingService {
       log.info("News Index not found in ES.");
     }
     log.info("Begin scraping news articles from : {}", ARCHIVE_URL);
-    scrapeNewsDocuments()
-        .forEach(newsDocumentsDao::save);
+    scrapeAndSaveNewsDocuments();
     log.info("Scraping news articles from : {} is successful.", ARCHIVE_URL);
   }
 
   /**
-   * Get the HTML Pages from The Hindu website archive and convert into document format to be inserted to ES.
-   *
-   * @return Collection of News Documents.
+   * Get the HTML Pages from The Hindu website archive and convert into document format and insert into ES.
    */
-  //  todo: Use flowables for faster operations
-  private List<NewsDocument> scrapeNewsDocuments() {
-    return DataExtractionUtil.getArchiveContainersFromMainPage(getWebPage(ARCHIVE_URL).get(), limit)
-        .stream()
+  private void scrapeAndSaveNewsDocuments() {
+    List<DomNode> archiveContainersFromMainPage = DataExtractionUtil.getArchiveContainersFromMainPage(
+        getWebPage(ARCHIVE_URL).get(), limit);
+    AtomicInteger counter = new AtomicInteger();
+    Flowable.fromIterable(archiveContainersFromMainPage)
+        .subscribeOn(new ComputationScheduler())
+        .parallel(8)
         .map(domNode -> DataExtractionUtil.getCalendarMonthUrls(domNode, limit))
-        .flatMap(Collection::stream)
+        .flatMap(Flowable::fromIterable)
         .map(this::getWebPage)
-        .flatMap(Streams::stream)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .map(htmlPage -> DataExtractionUtil.getCalendarDateUrls(htmlPage, limit))
-        .flatMap(Collection::stream)
+        .flatMap(Flowable::fromIterable)
         .map(this::getWebPage)
-        .flatMap(Streams::stream)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .map((htmlPage -> DataExtractionUtil.getTopicUrls(htmlPage, limit)))
-        .flatMap(Collection::stream)
+        .flatMap(Flowable::fromIterable)
         .map(this::getWebPage)
-        .flatMap(Streams::stream)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .map(NewsDocument::from)
-        .collect(Collectors.toList());
+        .filter(a -> !(Strings.isNullOrEmpty(a.getAuthor())
+            && Strings.isNullOrEmpty(a.getTopic())
+            && Strings.isNullOrEmpty(a.getDescription())))
+        .doOnNext(newsDocumentsDao::save)
+        .doOnNext(a -> counter.incrementAndGet())
+        .sequential()
+        .doOnComplete(() -> log.info("Inserted {} documents into ES.", counter.get()))
+        .blockingSubscribe();
   }
 
   private Optional<HtmlPage> getWebPage(String url) {
