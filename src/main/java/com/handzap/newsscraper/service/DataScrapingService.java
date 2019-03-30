@@ -31,16 +31,34 @@ public class DataScrapingService {
     this.newsDocumentsDao = newsDocumentsDao;
   }
 
+  /**
+   * Clear and initialize the ES dump by refreshing the data from the source.
+   * <p>
+   * Exception is thrown when deleteAll() is called if there is no index.
+   * This happens since Embedded ES is being used currently which is in-memory and deletes indexes at termination.
+   */
   //  todo: Use flowables for faster operations
   public void initializeDatabase() {
+    try {
+      newsDocumentsDao.deleteAll();
+      log.info("Deleted all old documents from News index in ES.");
+    } catch (Exception e) {
+
+      log.info("News Index not found in ES.");
+    }
     log.info("Begin scraping news articles from : {}", ARCHIVE_URL);
     scrapeNewsDocuments()
         .forEach(newsDocumentsDao::save);
     log.info("Scraping news articles from : {} is successful.", ARCHIVE_URL);
   }
 
+  /**
+   * Get the HTML Pages from The Hindu website archive and convert into document format to be inserted to ES.
+   *
+   * @return Collection of News Documents.
+   */
   //  todo: Use flowables for faster operations
-  public List<NewsDocument> scrapeNewsDocuments() {
+  private List<NewsDocument> scrapeNewsDocuments() {
     return DataExtractionUtil.getArchiveContainersFromMainPage(getWebPage(ARCHIVE_URL).get())
         .stream()
         .map(DataExtractionUtil::getCalendarMonthUrls)

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class DataExtractionUtil {
 
-  public static final String EMPTY_STRING = "";
+  private static final String EMPTY_STRING = "";
   private static final int LIMIT = 2;
 
   private DataExtractionUtil() {
@@ -26,33 +26,33 @@ public class DataExtractionUtil {
   }
 
   public static List<String> getCalendarDateUrls(HtmlPage htmlPage) {
-    return htmlPage.<HtmlAnchor>getByXPath("//div[@class='archiveBorder']//a")
-        .stream()
+    return limitAndgetHrefUsingXPath(htmlPage, "//div[@class='archiveBorder']//a");
+  }
+
+  public static List<String> limitAndgetHrefUsingXPath(HtmlPage htmlPage, String xPath) {
+    return htmlPage.<HtmlAnchor>getByXPath(xPath).stream()
         .map(HtmlAnchor::getHrefAttribute)
         .filter(href -> !Strings.isNullOrEmpty(href))
         .limit(LIMIT)
         .collect(Collectors.toList());
   }
 
-  public static List<String> getTopicUrls(HtmlPage a) {
-    return a.<HtmlAnchor>getByXPath(
-        "//div[@class='tpaper-container']//section//ul//a[starts-with(@href, 'https:')]")
-        .stream()
-        .map(HtmlAnchor::getHrefAttribute)
-        .filter(href -> !Strings.isNullOrEmpty(href))
-        .limit(LIMIT)
-        .collect(Collectors.toList());
+  public static List<String> getTopicUrls(HtmlPage htmlPage) {
+    return limitAndgetHrefUsingXPath(htmlPage,
+                                     "//div[@class='tpaper-container']//section//ul//a[starts-with(@href, 'https:')]");
   }
 
   public static String getTopicNameFromNewsPage(HtmlPage newsPage) {
-    Object titleObject = newsPage.getFirstByXPath("//h1[@class='title']/text()");
-    return null == titleObject ? EMPTY_STRING : titleObject.toString();
+    return getFirstByXpath(newsPage, "//h1[@class='title']/text()");
+  }
+
+  private static String getFirstByXpath(HtmlPage htmlPage, String xPath) {
+    Object object = htmlPage.getFirstByXPath(xPath);
+    return null == object ? EMPTY_STRING : object.toString();
   }
 
   public static String getAuthorNameFromNewsPage(HtmlPage newsPage) {
-    Object authorNameObject = newsPage.getFirstByXPath(
-        "//a[contains(@class, 'auth-nm')]/text()");
-    return null == authorNameObject ? EMPTY_STRING : authorNameObject.toString();
+    return getFirstByXpath(newsPage, "//a[contains(@class, 'auth-nm')]/text()");
   }
 
   public static String getDescriptionFromNewsPage(HtmlPage newsPage) {

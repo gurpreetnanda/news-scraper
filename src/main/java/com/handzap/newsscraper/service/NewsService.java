@@ -25,6 +25,8 @@ public class NewsService {
     return Lists.newArrayList(newsDocumentsDao.findAll()).stream()
         .map(NewsDocument::getAuthor)
         .filter(author -> !Strings.isNullOrEmpty(author))
+        .distinct()
+        .sorted()
         .collect(Collectors.toList());
   }
 
