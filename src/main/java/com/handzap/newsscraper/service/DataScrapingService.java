@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -23,12 +24,15 @@ public class DataScrapingService {
 
   private final WebClient webClient;
   private final NewsDocumentsDao newsDocumentsDao;
+  private final int limit;
 
   @Autowired
   public DataScrapingService(WebClient webClient,
-                             NewsDocumentsDao newsDocumentsDao) {
+                             NewsDocumentsDao newsDocumentsDao,
+                             @Value("${data-scrape-limit:10}") int limit) {
     this.webClient = webClient;
     this.newsDocumentsDao = newsDocumentsDao;
+    this.limit = limit;
   }
 
   /**
@@ -59,17 +63,17 @@ public class DataScrapingService {
    */
   //  todo: Use flowables for faster operations
   private List<NewsDocument> scrapeNewsDocuments() {
-    return DataExtractionUtil.getArchiveContainersFromMainPage(getWebPage(ARCHIVE_URL).get())
+    return DataExtractionUtil.getArchiveContainersFromMainPage(getWebPage(ARCHIVE_URL).get(), limit)
         .stream()
-        .map(DataExtractionUtil::getCalendarMonthUrls)
+        .map(domNode -> DataExtractionUtil.getCalendarMonthUrls(domNode, limit))
         .flatMap(Collection::stream)
         .map(this::getWebPage)
         .flatMap(Streams::stream)
-        .map(DataExtractionUtil::getCalendarDateUrls)
+        .map(htmlPage -> DataExtractionUtil.getCalendarDateUrls(htmlPage, limit))
         .flatMap(Collection::stream)
         .map(this::getWebPage)
         .flatMap(Streams::stream)
-        .map(DataExtractionUtil::getTopicUrls)
+        .map((htmlPage -> DataExtractionUtil.getTopicUrls(htmlPage, limit)))
         .flatMap(Collection::stream)
         .map(this::getWebPage)
         .flatMap(Streams::stream)

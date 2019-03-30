@@ -21,6 +21,11 @@ public class NewsService {
     this.newsDocumentsDao = newsDocumentsDao;
   }
 
+  /**
+   * Get all distinct Authors in Lexicographical sorted manner.
+   *
+   * @return all distinct Authors in Lexicographical sorted manner.
+   */
   public List<String> getAvailableAuthors() {
     return Lists.newArrayList(newsDocumentsDao.findAll()).stream()
         .map(NewsDocument::getAuthor)
@@ -30,7 +35,6 @@ public class NewsService {
         .collect(Collectors.toList());
   }
 
-  //  todo: Fix logic
   public List<NewsDocument> searchArticles(String author, String topic, String description) {
     return newsDocumentsDao.findByAuthorAndTopicAndDescription(author, topic, description);
   }

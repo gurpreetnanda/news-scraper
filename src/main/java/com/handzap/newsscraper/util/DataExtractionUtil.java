@@ -12,34 +12,34 @@ import java.util.stream.Collectors;
 public class DataExtractionUtil {
 
   private static final String EMPTY_STRING = "";
-  private static final int LIMIT = 2;
 
   private DataExtractionUtil() {
   }
 
-  public static List<String> getCalendarMonthUrls(DomNode domNode) {
+  public static List<String> getCalendarMonthUrls(DomNode domNode, int limit) {
     return domNode.<HtmlAnchor>getByXPath("div//a[starts-with(@href, 'https:')]").stream()
         .map(HtmlAnchor::getHrefAttribute)
         .filter(href -> !Strings.isNullOrEmpty(href))
-        .limit(LIMIT)
+        .limit(limit)
         .collect(Collectors.toList());
   }
 
-  public static List<String> getCalendarDateUrls(HtmlPage htmlPage) {
-    return limitAndgetHrefUsingXPath(htmlPage, "//div[@class='archiveBorder']//a");
+  public static List<String> getCalendarDateUrls(HtmlPage htmlPage, int limit) {
+    return limitAndgetHrefUsingXPath(htmlPage, "//div[@class='archiveBorder']//a", limit);
   }
 
-  public static List<String> limitAndgetHrefUsingXPath(HtmlPage htmlPage, String xPath) {
+  public static List<String> limitAndgetHrefUsingXPath(HtmlPage htmlPage, String xPath, int limit) {
     return htmlPage.<HtmlAnchor>getByXPath(xPath).stream()
         .map(HtmlAnchor::getHrefAttribute)
         .filter(href -> !Strings.isNullOrEmpty(href))
-        .limit(LIMIT)
+        .limit(limit)
         .collect(Collectors.toList());
   }
 
-  public static List<String> getTopicUrls(HtmlPage htmlPage) {
+  public static List<String> getTopicUrls(HtmlPage htmlPage, int limit) {
     return limitAndgetHrefUsingXPath(htmlPage,
-                                     "//div[@class='tpaper-container']//section//ul//a[starts-with(@href, 'https:')]");
+                                     "//div[@class='tpaper-container']//section//ul//a[starts-with(@href, 'https:')]",
+                                     limit);
   }
 
   public static String getTopicNameFromNewsPage(HtmlPage newsPage) {
@@ -64,10 +64,10 @@ public class DataExtractionUtil {
     return null == description ? EMPTY_STRING : description;
   }
 
-  public static List<DomNode> getArchiveContainersFromMainPage(HtmlPage mainPage) {
+  public static List<DomNode> getArchiveContainersFromMainPage(HtmlPage mainPage, int limit) {
     return mainPage.<DomNode>getByXPath("//div[@class='archiveContainer']")
         .stream()
-        .limit(LIMIT)
+        .limit(limit)
         .collect(Collectors.toList());
   }
 
