@@ -1,4 +1,4 @@
-package com.handzap.newsscraper.util;
+package com.gsn.newsscraper.util;
 
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomText;

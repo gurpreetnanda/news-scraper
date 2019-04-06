@@ -1,6 +1,6 @@
-package com.handzap.newsscraper.dao;
+package com.gsn.newsscraper.dao;
 
-import com.handzap.newsscraper.model.NewsDocument;
+import com.gsn.newsscraper.model.NewsDocument;
 import java.util.List;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;

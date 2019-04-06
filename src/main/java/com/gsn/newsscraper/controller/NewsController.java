@@ -1,7 +1,7 @@
-package com.handzap.newsscraper.controller;
+package com.gsn.newsscraper.controller;
 
-import com.handzap.newsscraper.model.NewsDocument;
-import com.handzap.newsscraper.service.NewsService;
+import com.gsn.newsscraper.model.NewsDocument;
+import com.gsn.newsscraper.service.NewsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;

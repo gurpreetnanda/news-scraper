@@ -1,4 +1,4 @@
-package com.handzap.newsscraper.configuration;
+package com.gsn.newsscraper.configuration;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import lombok.extern.slf4j.Slf4j;

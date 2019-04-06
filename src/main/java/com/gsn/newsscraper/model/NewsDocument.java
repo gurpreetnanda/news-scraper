@@ -1,7 +1,7 @@
-package com.handzap.newsscraper.model;
+package com.gsn.newsscraper.model;
 
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.handzap.newsscraper.util.DataExtractionUtil;
+import com.gsn.newsscraper.util.DataExtractionUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

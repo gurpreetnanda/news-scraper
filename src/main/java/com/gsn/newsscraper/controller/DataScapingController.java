@@ -1,6 +1,6 @@
-package com.handzap.newsscraper.controller;
+package com.gsn.newsscraper.controller;
 
-import com.handzap.newsscraper.service.DataScrapingService;
+import com.gsn.newsscraper.service.DataScrapingService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

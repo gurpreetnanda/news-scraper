@@ -1,12 +1,12 @@
-package com.handzap.newsscraper.service;
+package com.gsn.newsscraper.service;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.Strings;
-import com.handzap.newsscraper.dao.NewsDocumentsDao;
-import com.handzap.newsscraper.model.NewsDocument;
-import com.handzap.newsscraper.util.DataExtractionUtil;
+import com.gsn.newsscraper.dao.NewsDocumentsDao;
+import com.gsn.newsscraper.model.NewsDocument;
+import com.gsn.newsscraper.util.DataExtractionUtil;
 import io.reactivex.Flowable;
 import io.reactivex.internal.schedulers.ComputationScheduler;
 import java.util.List;

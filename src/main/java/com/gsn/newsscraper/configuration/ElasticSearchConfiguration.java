@@ -1,4 +1,4 @@
-package com.handzap.newsscraper.configuration;
+package com.gsn.newsscraper.configuration;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

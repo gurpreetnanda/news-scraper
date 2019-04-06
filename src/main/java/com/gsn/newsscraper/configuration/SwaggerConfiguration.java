@@ -1,4 +1,4 @@
-package com.handzap.newsscraper.configuration;
+package com.gsn.newsscraper.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,7 @@ public class SwaggerConfiguration {
   public Docket docketConfigurer() {
     return new Docket(DocumentationType.SWAGGER_2)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("com.handzap"))
+        .apis(RequestHandlerSelectors.basePackage("com.gsn"))
         .build();
   }
 }
